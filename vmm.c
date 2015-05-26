@@ -4,7 +4,10 @@
 #include "vmm.h"
 
 /* 页表 */
-PageTableItem pageTable[PAGE_SUM];
+//PageTableItem pageTable[PAGE_SUM];
+/*二级页表*/
+PageTableItem pageTable[ROOT_PAGE_SUM][CHILD_PAGE_SUM];
+
 /* 实存空间 */
 BYTE actMem[ACTUAL_MEMORY_SIZE];
 /* 用文件模拟辅存空间 */
@@ -16,69 +19,77 @@ Ptr_MemoryAccessRequest ptr_memAccReq;
 
 
 
-/* 初始化环境 */
+/* 初始化*/
 void do_init()
 {
-	int i, j;
-	srandom(time(NULL));
-	for (i = 0; i < PAGE_SUM; i++)
+	int i, j,k;
+	unsigned long auxAddr=0;
+	srandom(time(NULL));//设置用于生成随机序列的种子
+	for (i = 0; i < ROOT_PAGE_SUM; i++)
 	{
-		pageTable[i].pageNum = i;
-		pageTable[i].filled = FALSE;
-		pageTable[i].edited = FALSE;
-		pageTable[i].count = 0;
-		/* 使用随机数设置该页的保护类型 */
-		switch (random() % 7)
-		{
-			case 0:
+		for(k = 0; k<CHILD_PAGE_SUM; k++){
+			pageTable[i][k].pageNum = i;
+			pageTable[i][k].filled = FALSE;//页面装入的特征位
+			pageTable[i][k].edited = FALSE;//页面修改标示
+			pageTable[i][k].count = 0;//页面的使用次数
+			/* 随机将页面保护类型设置为以下其中情况中的一种 */
+			switch (random() % 7)
 			{
-				pageTable[i].proType = READABLE;
-				break;
+				case 0:
+				{
+					pageTable[i][j].proType = READABLE;
+					break;
+				}
+				case 1:
+				{
+					pageTable[i][j].proType = WRITABLE;
+					break;
+				}
+				case 2:
+				{
+					pageTable[i][j].proType = EXECUTABLE;
+					break;
+				}
+				case 3:
+				{
+					pageTable[i][j].proType = READABLE | WRITABLE;
+					break;
+				}
+				case 4:
+				{
+					pageTable[i][j].proType = READABLE | EXECUTABLE;
+					break;
+				}
+				case 5:
+				{
+					pageTable[i][j].proType = WRITABLE | EXECUTABLE;
+					break;
+				}
+				case 6:
+				{
+					pageTable[i][j].proType = READABLE | WRITABLE | EXECUTABLE;
+					break;
+				}
+				default:
+					break;
 			}
-			case 1:
-			{
-				pageTable[i].proType = WRITABLE;
-				break;
-			}
-			case 2:
-			{
-				pageTable[i].proType = EXECUTABLE;
-				break;
-			}
-			case 3:
-			{
-				pageTable[i].proType = READABLE | WRITABLE;
-				break;
-			}
-			case 4:
-			{
-				pageTable[i].proType = READABLE | EXECUTABLE;
-				break;
-			}
-			case 5:
-			{
-				pageTable[i].proType = WRITABLE | EXECUTABLE;
-				break;
-			}
-			case 6:
-			{
-				pageTable[i].proType = READABLE | WRITABLE | EXECUTABLE;
-				break;
-			}
-			default:
-				break;
-		}
 		/* 设置该页对应的辅存地址 */
-		pageTable[i].auxAddr = i * PAGE_SIZE * 2;
+			//这已经是一个二级页表了，辅存和页表项之间的对应关系已经不再单纯了；
+			//pageTable[i][k].auxAddr = (i*16+k)*PAFE_SIZE;
+			pageTable[i][k].auxAddr = auxAddr;
+			auxAddr += PAGE_SIZE;
+		}
 	}
-	for (j = 0; j < BLOCK_SUM; j++)
+	for (j = 0; j < BLOCK_SUM; j++)//用来作为物理块号的
 	{
-		/* 随机选择一些物理块进行页面装入 */
+		/* 随机选择一些物理块装入实存地址*/
 		if (random() % 2 == 0)
 		{
-			do_page_in(&pageTable[j], j);
-			pageTable[j].blockNum = j;
-			pageTable[j].filled = TRUE;
+			i = random() % ROOT_PAGE_SUM;
+			k = random() % CHILD_PAGE_SUM;
+			do_page_in(&pageTable[i][k], j);
+			pageTable[i][k].blockNum = j;
+			pageTable[i][k].filled = TRUE;
 			blockStatus[j] = TRUE;
 		}
 		else
