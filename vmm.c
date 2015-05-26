@@ -204,34 +204,39 @@ void do_page_fault(Ptr_PageTableItem ptr_pageTabIt)
 }
 
 /* 根据LFU算法进行页面替换 */
+//修改了，
 void do_LFU(Ptr_PageTableItem ptr_pageTabIt)
 {
-	unsigned int i, min, page;
+	unsigned int i,j, min = 0xFFFFFFFF, pagei = 0,pagej = 0;
 	printf("没有空闲物理块，开始进行LFU页面替换...\n");
-	for (i = 0, min = 0xFFFFFFFF, page = 0; i < PAGE_SUM; i++)
+	for (i = 0, min = 0xFFFFFFFF; i < ROOT_PAGE_SUM; i++)
 	{
-		if (pageTable[i].count < min)
+		for(j = 0; j<CHILD_PAGE_SUM; j++)
 		{
-			min = pageTable[i].count;
-			page = i;
+			if (pageTable[i][j].count < min&&pageTable[i][j].filled==TRUE)//在所有的被装入的页表中查找呦；
+			{
+				min = pageTable[i][j].count;
+				pagei = i;
+				pagej = j;
+			}
 		}
 	}
-	printf("选择第%u页进行替换\n", page);
-	if (pageTable[page].edited)
+	printf("选择第%u页目录进行替换，选择选择第%u页号进行替换\n", pagei,pagej);
+	if (pageTable[pagei][pagej].edited)//被改写过了
 	{
 		/* 页面内容有修改，需要写回至辅存 */
-		printf("该页内容有修改，写回至辅存\n");
-		do_page_out(&pageTable[page]);
+		printf("该页的内容有修改，写回至辅存\n");
+		do_page_out(&pageTable[pagei][pagej]);
 	}
-	pageTable[page].filled = FALSE;
-	pageTable[page].count = 0;
+	pageTable[pagei][pagej].filled = FALSE;//没有被装入；
+	pageTable[pagei][pagej].count = 0;
 
 
-	/* 读辅存内容，写入到实存 */
-	do_page_in(ptr_pageTabIt, pageTable[page].blockNum);
+	/* 将辅存内容写入实存 */
+	do_page_in(ptr_pageTabIt, pageTable[pagei][pagej].blockNum);//这个位置的被取代了；
 	
 	/* 更新页表内容 */
-	ptr_pageTabIt->blockNum = pageTable[page].blockNum;
+	ptr_pageTabIt->blockNum = pageTable[pagei][pagej].blockNum;
 	ptr_pageTabIt->filled = TRUE;
 	ptr_pageTabIt->edited = FALSE;
 	ptr_pageTabIt->count = 0;
@@ -386,16 +391,20 @@ void do_request()
 }
 
 /* 打印页表 */
+//修改但是还是有问题
 void do_print_info()
 {
 	unsigned int i, j, k;
 	char str[4];
-	printf("页号\t块号\t装入\t修改\t保护\t计数\t辅存\n");
-	for (i = 0; i < PAGE_SUM; i++)
+	printf("页目录\t页号\t块号\t装入\t修改\t保护\t计数\t辅存\n");
+	for (i = 0; i < ROOT_PAGE_SUM; i++)
 	{
-		printf("%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i, pageTable[i].blockNum, pageTable[i].filled, 
-			pageTable[i].edited, get_proType_str(str, pageTable[i].proType), 
-			pageTable[i].count, pageTable[i].auxAddr);
+		for(j = 0; j<CHILD_PAGE_SUM; j++)
+		{
+			printf("%u\t%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i,j,pageTable[i].blockNum, pageTable[i].filled, 
+				pageTable[i].edited, get_proType_str(str, pageTable[i].proType), 
+				pageTable[i].count, pageTable[i].auxAddr);
+		}
 	}
 }
 
