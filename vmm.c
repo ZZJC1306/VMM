@@ -16,7 +16,8 @@ FILE *ptr_auxMem;
 BOOL blockStatus[BLOCK_SUM];
 /* 访存请求 */
 Ptr_MemoryAccessRequest ptr_memAccReq;
-
+//LRU的链表
+ PageNode *head = NULL;
 
 
 /* 初始化*/
@@ -91,6 +92,7 @@ void do_init()
 			pageTable[i][k].blockNum = j;
 			pageTable[i][k].filled = TRUE;
 			blockStatus[j] = TRUE;
+			LRU_ChangeAdd(j);
 		}
 		else
 			blockStatus[j] = FALSE;
@@ -124,6 +126,8 @@ void do_response()
 	if (!ptr_pageTabIt->filled)
 	{
 		do_page_fault(ptr_pageTabIt);
+	}else{
+		LRU_ChangeAdd(ptr_pageTabIt->blockNum);
 	}
 	
 	actAddr = ptr_pageTabIt->blockNum * PAGE_SIZE + offAddr;
@@ -196,11 +200,13 @@ void do_page_fault(Ptr_PageTableItem ptr_pageTabIt)
 			ptr_pageTabIt->count = 0;
 			
 			blockStatus[i] = TRUE;
+		LRU_ChangeAdd(i);
 			return;
 		}
 	}
 	/* 没有空闲物理块，进行页面替换 */
-	do_LFU(ptr_pageTabIt);
+	//do_LFU(ptr_pageTabIt);
+	do_LRU(ptr_pageTabIt);
 }
 
 /* 根据LFU算法进行页面替换 */
@@ -242,6 +248,106 @@ void do_LFU(Ptr_PageTableItem ptr_pageTabIt)
 	ptr_pageTabIt->count = 0;
 	printf("页面替换成功\n");
 }
+
+unsigned int LRU_get(){
+	PageNode p;
+	int blockNum;
+	p = head;
+	blockNum = p->blockNum;
+	head = head->link;
+	free(p);
+	return blockNum;
+}
+
+void LRU_ChangeAdd(int blockNum){
+	//新进来一个，先判断里面是不是有一样的，如果有一样的，就把它删了，然后再把新进来的补上去；
+	PageNode p = head,r = head;
+	if(head==NULL){
+		LRU_add(blockNum);
+	}
+	else{
+		while(p->blockNum!=blockNum && p!=NULL){
+			r = p;
+			p = p->link;
+		}
+		if(p==NULL){//找到最后了也没有找到
+			LRU_add(blockNum);
+		}
+		else{//找到了；
+			if(p==head)
+				head = head->link;
+			else
+				r->link = p->link;
+			free(p);
+			LRU_add(blockNum);
+		}
+	}
+}
+
+void LRU_add(int blockNum){
+	PageNode p,q,r = head;
+	p = (PageNode)malloc(sizeof(Node));
+	p->blockNum = blockNum;
+	p->link = NULL;
+	if(head==NULL){
+		head = p;
+	}else{
+		while(r->link!=null)
+			r = r->link;
+		r->link = p;
+	}
+}
+
+//和LFU差不多，就是判断条件变了；怎么知道什么是最早最久使用的呢，建立一个链表，一旦使用了哪个
+void do_LRU(Ptr_PageTableItem ptr_pageTabIt){
+
+	unsigned int i,j, pagei = 0,pagej = 0，blockNum;
+	int flag = 0;
+	printf("没有空闲物理块，开始进行LFU页面替换...\n");
+	while(flag==0){
+		//如果一直没有找到，说明当前的第一个已经被挪走了，再取一个；
+		blockNum = LRU_get();
+		for (i = 0; i < ROOT_PAGE_SUM; i++)
+		{
+			for(j = 0; j<CHILD_PAGE_SUM; j++)
+			{
+				if (pageTable[i][j].blockNum==blockNum && pageTable[i][j].filled==TRUE)
+				//在所有的被装入的页表中查找呦；谁最久没有被使用过了；找到在物理内存中的并且最早最久没被使用过的；
+				{
+					flag = 1;
+					pagei = i;
+					pagej = j;
+					//如何跳出两个循环?设置一个标示位；
+					break;
+				}
+				if(flag==1)
+					break;
+			}
+		}
+	}
+	printf("选择第%u页目录进行替换，选择选择第%u页号进行替换\n", pagei,pagej);
+	if (pageTable[pagei][pagej].edited)//被改写过了
+	{
+		/* 页面内容有修改，需要写回至辅存 */
+		printf("该页的内容有修改，写回至辅存\n");
+		do_page_out(&pageTable[pagei][pagej]);
+	}
+	pageTable[pagei][pagej].filled = FALSE;//没有被装入；
+	pageTable[pagei][pagej].count = 0;
+
+
+	/* 将辅存内容写入实存 */
+	do_page_in(ptr_pageTabIt, pageTable[pagei][pagej].blockNum);//这个位置的被取代了；
+	
+	/* 更新页表内容 */
+	ptr_pageTabIt->blockNum = pageTable[pagei][pagej].blockNum;
+	ptr_pageTabIt->filled = TRUE;
+	ptr_pageTabIt->edited = FALSE;
+	ptr_pageTabIt->count = 0;
+	LRU_ChangeAdd(blockNum);
+	printf("页面替换成功\n");
+}
+
 
 /* 将辅存内容写入实存 */
 void do_page_in(Ptr_PageTableItem ptr_pageTabIt, unsigned int blockNum)
