@@ -86,6 +86,12 @@ typedef enum {
 	ERROR_FILE_WRITE_FAILED //文件写入失败
 } ERROR_CODE;
 
+//用来建立LRU链表的结构体；
+typedef struct node{
+	int blockNum;
+	struct node *link;
+}Node,*PageNode;
+
 /* 产生访存请求 */
 void do_request();
 
@@ -113,5 +119,10 @@ void do_print_info();
 /* 获取页面保护类型字符串 */
 char *get_proType_str(char *, BYTE);
 
+//LRU;
+void LRU_add(int blockNum);
+void LRU_ChangeAdd(int blockNum);
+void do_LRU(Ptr_PageTableItem);
+unsigned int LRU_get();
 
 #endif
