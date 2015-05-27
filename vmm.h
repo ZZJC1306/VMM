@@ -20,6 +20,10 @@
 #define PAGE_SUM (VIRTUAL_MEMORY_SIZE / PAGE_SIZE)
 /* 总物理块数 */
 #define BLOCK_SUM (ACTUAL_MEMORY_SIZE / PAGE_SIZE)
+/* 页目录（一级）项数 */
+#define ROOT_PAGE_SUM 4
+/* 二级页表项数 */
+#define CHILD_PAGE_SUM (PAGE_SUM / ROOT_PAGE_SUM)
 
 
 /* 可读标识位 */
