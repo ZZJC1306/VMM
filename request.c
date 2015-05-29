@@ -19,7 +19,6 @@ int main()
 	/* 在循环中模拟访存请求与处理过程 */
 
 	while (TRUE)
-
 	{
 		//读取文件
 		bzero(&cmd,DATALEN);
@@ -70,57 +69,32 @@ void do_handrequest(){
 	/* 输入产生请求类型 */
 
 	switch (a%3)
-
 	{
-
 		case 0: //读请求
-
 		{
-
 			ptr_memAccReq->reqType = REQUEST_READ;
-
 			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：读取\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum);
-
 			break;
-
 		}
-
 		case 1: //写请求
-
 		{
-
 			ptr_memAccReq->reqType = REQUEST_WRITE;
-
 			/* 产生待写入的值 */
-
 			printf("请输入待写入的值...\n");
-
 			scanf("%02x",&ptr_memAccReq->value);
-
 			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum, ptr_memAccReq->value);
-
+			
 			break;
-
 		}
-
 		case 2:
-
 		{
-
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
-
 			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：执行\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum);
-
 			break;
-
 		}
-
 		default:
-
 			break;
-
 	}	
-
 }
 
 
@@ -128,7 +102,6 @@ void do_handrequest(){
 /* 产生访存请求 */
 
 void do_request()
-
 {
 
 	/* 随机产生请求地址 */
@@ -144,23 +117,16 @@ void do_request()
 	/* 随机产生请求类型 */
 
 	switch (random() % 3)
-
 	{
-
 		case 0: //读请求
-
 		{
 
 			ptr_memAccReq->reqType = REQUEST_READ;
-
 			printf("产生请求：\n地址：%u\t进程号：%u\t类型：读取\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
-
 			break;
-
 		}
 
 		case 1: //写请求
-
 		{
 
 			ptr_memAccReq->reqType = REQUEST_WRITE;
