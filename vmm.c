@@ -315,7 +315,7 @@ void LRU_add(int blockNum){
 	if(head==NULL){
 		head = p;
 	}else{
-		while(r->link!=null)
+		while(r->link!=NULL)
 			r = r->link;
 		r->link = p;
 	}
