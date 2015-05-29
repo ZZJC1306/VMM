@@ -1080,7 +1080,7 @@ void do_handrequest(){
 
 			scanf("%02x",&ptr_memAccReq->value);
 
-			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum, ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum, ptr_memAccReq->value);
 
 			break;
 
