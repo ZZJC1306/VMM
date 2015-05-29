@@ -483,7 +483,7 @@ void do_LFU(Ptr_PageTableItem ptr_pageTabIt)
 
 	unsigned int i,j, min = 0xFFFFFFFF, pagei = 0,pagej = 0;
 
-	printf("没有空闲物理块，开始进行LFU页面替换...\n");
+	printf("没有空闲物理块，开始进行LRU页面替换...\n");
 
 	for (i = 0, min = 0xFFFFFFFF; i < ROOT_PAGE_SUM; i++)
 
@@ -986,20 +986,15 @@ void do_handrequest(){
 	/* 产生请求地址 */
 
 	int a;
+	printf("请输入请求地址:\n");
+	scanf("%u",&ptr_memAccReq->virAddr);
 
-	unsigned long virAddr;
+	printf("请输入请求类型：请求类型中：0-read，1-write，2-execute\n");
 
-
-
-	printf("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute\n");
-
-	scanf("%d %d",&virAddr,&a);
-
-	ptr_memAccReq->virAddr = virAddr;
-
+	scanf("%d",&a);
 	/* 随机产生请求类型 */
 
-	switch (a)
+	switch (a%3)
 
 	{
 
