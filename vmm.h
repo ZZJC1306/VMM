@@ -66,11 +66,6 @@ typedef enum {
 	REQUEST_EXECUTE 
 } MemoryAccessRequestType;
 
-typedef struct
-{
-	char c;
-	MemoryAccessRequest request;
-}CMD;
 #define DATALEN sizeof(CMD)
 /* 访存请求 */
 typedef struct
@@ -81,7 +76,11 @@ typedef struct
 	BYTE value; //写请求的值
 } MemoryAccessRequest, *Ptr_MemoryAccessRequest;
 
-
+typedef struct
+{
+	char c;
+	MemoryAccessRequest request;
+}CMD;
 /* 访存错误代码 */
 typedef enum {
 	ERROR_READ_DENY, //该页不可读
@@ -99,8 +98,7 @@ typedef enum {
 	ERROR_FIFO_CREATE_FAILED,//fifo文件创建失败
 	ERROR_FIFO_OPEN_FAILED,//fifo文件打开失败
 	ERROR_FIFO_READ_FAILED,//fifo文件读取失败
-	ERROR_FIFO_REMOVE_FAILED,//fifo文件删除失败
-	ERROR_PROCESS_DISMATCH//进程编号不匹配
+	ERROR_FIFO_REMOVE_FAILED//fifo文件删除失败
 } ERROR_CODE;
 
 //用来建立LRU链表的结构体；
