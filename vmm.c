@@ -491,7 +491,7 @@ void do_handrequest(){
 	int a;
 	unsigned long virAddr;
 
-	print("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute");
+	printf("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute");
 	scanf("%d %d",&virAddr,&a);
 	ptr_memAccReq->virAddr = virAddr;
 	/* 随机产生请求类型 */
