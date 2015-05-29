@@ -1451,7 +1451,7 @@ int main(int argc, char* argv[])
 
 			c = getchar();
 
-		printf("按B打印虚存，按其他键不打印...\n");
+		printf("按B打印辅存，按其他键不打印...\n");
 
 		if ((c = getchar()) == 'b' || c == 'B')
 
