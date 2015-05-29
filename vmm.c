@@ -1407,6 +1407,7 @@ int main(int argc, char* argv[])
 	{
 		//读取文件
 		bzero(&cmd,DATALEN);
+		c = cmd.c;
 		if((countnum = read(fifo,&cmd,DATALEN))<0)
 		{
 			do_error(ERROR_FIFO_READ_FAILED);
@@ -1416,62 +1417,25 @@ int main(int argc, char* argv[])
 		if(countnum == 0){
 			continue;
 		}
-		printf("按D手动输入命令，按其他键自动生成命令...\n");
-
-		if ((c = getchar()) == 'D' || c == 'd')
-
-			do_handrequest();
-		else
-			do_request();
-
-		while (c != '\n')
-
-			c = getchar();
-
-		do_response();
-
-		printf("按Y打印页表，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'y' || c == 'Y')
-
+//		printf("按D手动输入命令，按其他键自动生成命令...\n");
+		else if(c == 'y'||c == 'Y')
 			do_print_info();
-
-		while (c != '\n')
-
-			c = getchar();
-
-
-		printf("按A打印实存，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'a' || c == 'A')
-
-			do_print_actual();
-
-		while (c != '\n')
-
-			c = getchar();
-
-		printf("按B打印辅存，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'b' || c == 'B')
-
+		else if(c == 'a'||c == 'A')
+			do_print_zctMem();
+		else if(c == 'n'||c =='N')
+		{
+			ptr_memAccReq = &(cmd.request);
+			do_response();
+		}
+		else if(c == 'b' || c == 'B')
 			do_print_virtual();
-
-		while (c != '\n')
-
-			c = getchar();
-
-		printf("按X退出程序，按其他键继续...\n");
-
-		if ((c = getchar()) == 'x' || c == 'X')
-
+		else if(c == 'c'||c == 'C'){
+			ptr_memAccReq = &(cmd.request);
+			do_response();
+		}
+//		printf("按Y打印页表，按其他键不打印...\n")
+		else if (c == 'x'||c=='X')
 			break;
-
-		while (c != '\n')
-
-			c = getchar();
-
-		//sleep(5000);
 
 	}
 
