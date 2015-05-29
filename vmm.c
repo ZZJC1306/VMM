@@ -268,8 +268,12 @@ void do_response()
 		return;
 
 	}
-
 	
+	/*jjjj检查进程编号是否符合要求*/
+	if(ptr_memAccReq->processNum < 0||ptr_memAccReq->processNum >= PROCESSNUM){
+		do_erro(ERROR_PROCESS_NOT_FOUND);
+		return;
+	}
 
 	/* 计算页号和页内偏移值 */
 
