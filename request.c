@@ -23,13 +23,20 @@ int main()
 	{
 		//读取文件
 		bzero(&cmd,DATALEN);
-		printf("按D手动输入命令，按其他键自动生成命令...\n");
-
-		if ((c = getchar()) == 'D' || c == 'd')
-
-			do_handrequest();
-		else
+		printf("按A打印实存，按B打印辅存，按D手动产生请求，按N随机产生新请求，按X退出程序\n");
+		c = getchar();
+		if (c == 'n' || c == 'N')
+		{
+			cmd.c = 'n';
 			do_request();
+		}
+			
+		else if(c == 'c' || c == 'C')
+		{
+			cmd.c = 'c';
+			do
+		}
+			
 
 		while (c != '\n')
 
