@@ -991,7 +991,7 @@ void do_handrequest(){
 
 
 
-	printf("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute");
+	printf("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute\n");
 
 	scanf("%d %d",&virAddr,&a);
 
@@ -1329,8 +1329,17 @@ int main(int argc, char* argv[])
 	while (TRUE)
 
 	{
+		printf("按D手动输入命令，按其他键自动生成命令...\n");
 
-		do_request();
+		if ((c = getchar()) == 'D' || c == 'd')
+
+			do_handrequest();
+		else
+			do_request();
+
+		while (c != '\n')
+
+			c = getchar();
 
 		do_response();
 
