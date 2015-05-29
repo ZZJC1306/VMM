@@ -47,7 +47,8 @@ typedef enum {
 /* 页表项 */
 typedef struct
 {
-	unsigned int pageNum;
+	unsigned int rootpageNum;
+	unsigned int childpageNum;
 	unsigned int blockNum; //物理块号
 	BOOL filled; //页面装入特征位
 	BYTE proType; //页面保护类型
