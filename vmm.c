@@ -21,6 +21,7 @@ Ptr_MemoryAccessRequest ptr_memAccReq;
 
 
 /* 初始化*/
+//修改了二级页表
 void do_init()
 {
 	int i, j,k;
@@ -38,37 +39,37 @@ void do_init()
 			{
 				case 0:
 				{
-					pageTable[i][j].proType = READABLE;
+					pageTable[i][k].proType = READABLE;
 					break;
 				}
 				case 1:
 				{
-					pageTable[i][j].proType = WRITABLE;
+					pageTable[i][k].proType = WRITABLE;
 					break;
 				}
 				case 2:
 				{
-					pageTable[i][j].proType = EXECUTABLE;
+					pageTable[i][k].proType = EXECUTABLE;
 					break;
 				}
 				case 3:
 				{
-					pageTable[i][j].proType = READABLE | WRITABLE;
+					pageTable[i][k].proType = READABLE | WRITABLE;
 					break;
 				}
 				case 4:
 				{
-					pageTable[i][j].proType = READABLE | EXECUTABLE;
+					pageTable[i][k].proType = READABLE | EXECUTABLE;
 					break;
 				}
 				case 5:
 				{
-					pageTable[i][j].proType = WRITABLE | EXECUTABLE;
+					pageTable[i][k].proType = WRITABLE | EXECUTABLE;
 					break;
 				}
 				case 6:
 				{
-					pageTable[i][j].proType = READABLE | WRITABLE | EXECUTABLE;
+					pageTable[i][k].proType = READABLE | WRITABLE | EXECUTABLE;
 					break;
 				}
 				default:
@@ -99,6 +100,23 @@ void do_init()
 	}
 }
 
+//初始化文件
+void initFile(){
+
+	int i;
+	char *key="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	char buffer[VIRTUAL_MEMORY_SIZE+1];
+	
+	ptr_auxMem=fopen(AUXILIARY_MEMORY,"w+");
+	for(i=0;i<VIRTUAL_MEMORY_SIZE;i++){
+		buffer[i]=key[rand()%62];
+	}
+	buffer[VIRTUAL_MEMORY_SIZE]=0;
+	
+	fwrite(buffer,sizeof(BYTE),VIRTUAL_MEMORY_SIZE,ptr_auxMem);
+	printf("系统提示：初始化辅存模拟文件成功\n");
+	fclose(ptr_auxMem);
+}
 
 /* 响应请求*/
 //已更新二级页表
@@ -468,6 +486,43 @@ void do_error(ERROR_CODE code)
 	}
 }
 
+void do_handrequest(){
+	/* 产生请求地址 */
+	int a;
+	unsigned long virAddr;
+
+	print("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-")
+	scanf("%d %d",&virAddr,&a);
+	ptr_memAccReq->virAddr = virAddr;
+	/* 随机产生请求类型 */
+	switch (a)
+	{
+		case 0: //读请求
+		{
+			ptr_memAccReq->reqType = REQUEST_READ;
+			printf("产生请求：\n地址：%u\t类型：读取\n", ptr_memAccReq->virAddr);
+			break;
+		}
+		case 1: //写请求
+		{
+			ptr_memAccReq->reqType = REQUEST_WRITE;
+			/* 产生待写入的值 */
+			printf("请输入待写入的值...\n");
+			scanf("%02x",&ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr, ptr_memAccReq->value);
+			break;
+		}
+		case 2:
+		{
+			ptr_memAccReq->reqType = REQUEST_EXECUTE;
+			printf("产生请求：\n地址：%u\t类型：执行\n", ptr_memAccReq->virAddr);
+			break;
+		}
+		default:
+			break;
+	}	
+}
+
 /* 产生访存请求 */
 void do_request()
 {
@@ -487,13 +542,13 @@ void do_request()
 			ptr_memAccReq->reqType = REQUEST_WRITE;
 			/* 随机产生待写入的值 */
 			ptr_memAccReq->value = random() % 0xFFu;
-			printf("产生请求：\n地址：%u\t类型：写入\t值：%02X\n", ptr_memAccReq->virAddr, ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr, ptr_memAccReq->value);
 			break;
 		}
 		case 2:
 		{
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
-			printf("产生请求：\n地址：%u\t类型：执行\n", ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t类型：执行\n",ptr_memAccReq->virAddr);
 			break;
 		}
 		default:
@@ -502,7 +557,7 @@ void do_request()
 }
 
 /* 打印页表 */
-//修改但是还是有问题
+//修改了二级页表
 void do_print_info()
 {
 	unsigned int i, j, k;
@@ -517,6 +572,55 @@ void do_print_info()
 				pageTable[i].count, pageTable[i].auxAddr);
 		}
 	}
+}
+
+/*打印辅存内容*/
+void do_print_virtual(){
+	int i,j,k,readNum,p;
+	printf("打印辅存内容:\n");
+	
+	BYTE temp[VIRTUAL_MEMORY_SIZE];
+	if (fseek(ptr_auxMem, 0, SEEK_SET) < 0)
+	{
+		do_error(ERROR_FILE_SEEK_FAILED);
+		exit(1);
+	}
+	if ((readNum = fread(temp, 
+		sizeof(BYTE), VIRTUAL_MEMORY_SIZE, ptr_auxMem)) < VIRTUAL_MEMORY_SIZE)
+	{
+		do_error(ERROR_FILE_READ_FAILED);
+		exit(1);
+	}
+	printf("1级页号\t2级页号\t辅存\t内容\t\n");
+	for(i=0,k=0;i<ROOT_PAGE_SUM;i++)
+	{
+		for(p=0;p<CHILD_PAGE_SUM;p++)
+		{
+			printf("%d\t%d\t%d\t",i,p,k);
+			for(j=0;j<PAGE_SIZE;j++){
+				printf("%02x ",temp[k++]);
+			}
+			printf("\n");
+		}
+	}
+
+}
+
+/*打印实存内容*/
+void do_print_actual(){
+	int i,j,k;
+	printf("打印实存内容:\n");
+	
+	printf("页号\t内容\t\n");
+	for(i=0,k=0;i<BLOCK_SUM;i++){
+		printf("%d\t",i);
+		if(blockStatus[i]==TRUE){
+			for(j=0;j<PAGE_SIZE;j++)		
+				printf("%02x ",actMem[k++]);
+		}
+		printf("\n");
+	}
+
 }
 
 /* 获取页面保护类型字符串 */
