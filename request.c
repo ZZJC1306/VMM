@@ -54,7 +54,8 @@ int main()
 void do_handrequest(){
 
 	/* 产生请求地址 */
-
+	BYTE value;
+	unsigned long addr;
 	int a;
 	printf("请输入请求地址:\n");
 	scanf("%u",&ptr_memAccReq->virAddr);
