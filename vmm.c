@@ -1395,7 +1395,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 	/*打开文件*/
-	if((fifo = open("/tmp/server",0_RDONLY))<0)
+	if((fifo = open("/tmp/server",O_RDONLY))<0)
 	{
 		do_error(ERROR_FIFO_OPEN_FAILED);
 		exit(1);
