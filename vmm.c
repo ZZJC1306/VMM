@@ -1025,7 +1025,7 @@ void do_error(ERROR_CODE code)
 		{
 
 			printf("未知错误：没有这个错误代码\n");
-			break；
+			break;
 
 		}
 
