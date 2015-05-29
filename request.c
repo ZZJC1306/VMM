@@ -120,7 +120,6 @@ void do_request()
 	{
 		case 0: //读请求
 		{
-
 			ptr_memAccReq->reqType = REQUEST_READ;
 			printf("产生请求：\n地址：%u\t进程号：%u\t类型：读取\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 			break;
@@ -128,33 +127,21 @@ void do_request()
 
 		case 1: //写请求
 		{
-
 			ptr_memAccReq->reqType = REQUEST_WRITE;
 
 			/* 随机产生待写入的值 */
-
 			ptr_memAccReq->value = random() % 0xFFu;
-
 			printf("产生请求：\n地址：%u\t进程号：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum, ptr_memAccReq->value);
-
 			break;
-
 		}
 
 		case 2:
-
 		{
-
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
-
 			printf("产生请求：\n地址：%u\t进程号：%u\t类型：执行\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
-
 			break;
-
 		}
-
 		default:
-
 			break;
 
 	}	
