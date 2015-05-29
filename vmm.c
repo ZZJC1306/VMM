@@ -1,67 +1,43 @@
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <time.h>
-
 #include "vmm.h"
-
 #include<errno.h>
 
-
 /* 页表 */
-
 //PageTableItem pageTable[PAGE_SUM];
 
 /*二级页表*/
-
 PageTableItem pageTable[ROOT_PAGE_SUM][CHILD_PAGE_SUM];
 
-
-
 /* 实存空间 */
-
 BYTE actMem[ACTUAL_MEMORY_SIZE];
 
 /* 用文件模拟辅存空间 */
-
 FILE *ptr_auxMem;
 
 /* 物理块使用标识 */
-
 BOOL blockStatus[BLOCK_SUM];
 
 /* 访存请求 */
-
 Ptr_MemoryAccessRequest ptr_memAccReq;
 
 //LRU的链表
-
  PageNode head = NULL;
 ///////////////////////
 int fifo;
 
 
 
-
 /* 初始化*/
-
 //修改了二级页表
-
 void do_init()
-
 {
-
 	int i, j,k;
-
 	unsigned long auxAddr=0;
-
 	srandom(time(NULL));//设置用于生成随机序列的种子
-
 	for (i = 0; i < ROOT_PAGE_SUM; i++)
-
 	{
-
 		for(k = 0; k<CHILD_PAGE_SUM; k++){
 
 			pageTable[i][k].rootpageNum = i;
@@ -80,133 +56,70 @@ void do_init()
 			else pageTable[i][k].processNum = 1;
 
 			/* 随机将页面保护类型设置为以下其中情况中的一种 */
-
 			switch (random() % 7)
-
 			{
-
 				case 0:
-
 				{
-
 					pageTable[i][k].proType = READABLE;
-
 					break;
-
 				}
-
 				case 1:
-
 				{
-
 					pageTable[i][k].proType = WRITABLE;
-
 					break;
-
 				}
-
 				case 2:
-
 				{
-
 					pageTable[i][k].proType = EXECUTABLE;
-
 					break;
-
 				}
-
 				case 3:
-
 				{
-
 					pageTable[i][k].proType = READABLE | WRITABLE;
-
 					break;
-
 				}
-
 				case 4:
-
 				{
-
 					pageTable[i][k].proType = READABLE | EXECUTABLE;
-
 					break;
-
 				}
-
 				case 5:
-
 				{
-
 					pageTable[i][k].proType = WRITABLE | EXECUTABLE;
-
 					break;
-
 				}
-
 				case 6:
-
 				{
-
 					pageTable[i][k].proType = READABLE | WRITABLE | EXECUTABLE;
-
 					break;
-
 				}
-
 				default:
-
 					break;
-
 			}
-
 		/* 设置该页对应的辅存地址 */
-
 			//这已经是一个二级页表了，辅存和页表项之间的对应关系已经不再单纯了；
-
 			//pageTable[i][k].auxAddr = (i*16+k)*PAFE_SIZE;
-
 			pageTable[i][k].auxAddr = auxAddr;
-
 			auxAddr += PAGE_SIZE;
-
 		}
-
 	}
 
 	for (j = 0; j < BLOCK_SUM; j++)//用来作为物理块号的
-
 	{
-
 		/* 随机选择一些物理块装入实存地址*/
-
 		if (random() % 2 == 0)
-
 		{
-
 			i = random() % ROOT_PAGE_SUM;
-
 			k = random() % CHILD_PAGE_SUM;
-
 			do_page_in(&pageTable[i][k], j);
-
 			pageTable[i][k].blockNum = j;
-
 			pageTable[i][k].filled = TRUE;
-
 			blockStatus[j] = TRUE;
-
 			LRU_ChangeAdd(j);
-
 		}
-
 		else
-
 			blockStatus[j] = FALSE;
-
 	}
-
 }
 
 
