@@ -34,59 +34,22 @@ int main()
 		else if(c == 'c' || c == 'C')
 		{
 			cmd.c = 'c';
-			do
+			do_handrequest();
 		}
-			
-
-		while (c != '\n')
-
-			c = getchar();
-
-		do_response();
-
-		printf("按Y打印页表，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'y' || c == 'Y')
-
-			do_print_info();
-
-		while (c != '\n')
-
-			c = getchar();
-
-
-		printf("按A打印实存，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'a' || c == 'A')
-
-			do_print_actual();
-
-		while (c != '\n')
-
-			c = getchar();
-
-		printf("按B打印辅存，按其他键不打印...\n");
-
-		if ((c = getchar()) == 'b' || c == 'B')
-
-			do_print_virtual();
-
-		while (c != '\n')
-
-			c = getchar();
-
-		printf("按X退出程序，按其他键继续...\n");
-
-		if ((c = getchar()) == 'x' || c == 'X')
-
-			break;
-
-		while (c != '\n')
-
-			c = getchar();
-
-		//sleep(5000);
-
+		
+		else
+			cmd.c = c;
+		if((fd = open("/tmp/server,O_WRONLY"))<0)
+		{
+			printf("open fifo failed");
+			exit(1);
+		}
+		if(write(fd,&cmd,DATALEN)<0)
+		{
+			printf("write faied");
+			exit(1);
+		}
+	close(fd);	
 	}
 }
 void do_handrequest(){
