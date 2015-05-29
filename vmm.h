@@ -71,7 +71,7 @@ typedef struct
 	char c;
 	MemoryAccessRequest request;
 }CMD;
-#define DATALEN sizeof(CMD);
+#define DATALEN sizeof(CMD)
 /* 访存请求 */
 typedef struct
 {
