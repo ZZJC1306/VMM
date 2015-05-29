@@ -42,7 +42,8 @@ typedef enum {
 	TRUE = 1, FALSE = 0
 } BOOL;
 
-
+/*JJJ定义进程总数*/
+#define PROCESSNUM 2;
 
 /* 页表项 */
 typedef struct
@@ -55,6 +56,7 @@ typedef struct
 	BOOL edited; //页面修改标识
 	unsigned long auxAddr; //外存地址
 	unsigned long count; //页面使用计数器
+	unsigned int processNum;//进程编号
 } PageTableItem, *Ptr_PageTableItem;
 
 /* 访存请求类型 */
@@ -67,6 +69,7 @@ typedef enum {
 /* 访存请求 */
 typedef struct
 {
+	unsigned int processNum;//进程编号
 	MemoryAccessRequestType reqType; //访存请求类型
 	unsigned long virAddr; //虚地址
 	BYTE value; //写请求的值
@@ -84,7 +87,13 @@ typedef enum {
 	ERROR_FILE_CLOSE_FAILED, //文件关闭失败
 	ERROR_FILE_SEEK_FAILED, //文件指针定位失败
 	ERROR_FILE_READ_FAILED, //文件读取失败
-	ERROR_FILE_WRITE_FAILED //文件写入失败
+	ERROR_FILE_WRITE_FAILED, //文件写入失败
+	ERROR_PROCESS_NOT_FOUND, //进程不存在
+	ERROR_PROCESS_DISMATCH,//进程不匹配
+	ERROR_FIFO_CREATE_FAILED,//fifo文件创建失败
+	ERROR_FIFO_OPEN_FAILED,//fifo文件打开失败
+	ERROR_FIFO_READ_FAILED,//fifo文件读取失败
+	ERROR_FIFO_REMOVE_FAILED//fifo文件删除失败
 } ERROR_CODE;
 
 //用来建立LRU链表的结构体；
