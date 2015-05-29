@@ -1338,7 +1338,7 @@ int main(int argc, char* argv[])
 		else if(c == 'y'||c == 'Y')
 			do_print_info();
 		else if(c == 'a'||c == 'A')
-			do_print_actual();
+			do_print_actMem();
 		else if(c == 'n'||c =='N')
 		{
 			ptr_memAccReq = &(cmd.request);
