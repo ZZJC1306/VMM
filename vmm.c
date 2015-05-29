@@ -290,11 +290,11 @@ void LRU_ChangeAdd(int blockNum){
 		LRU_add(blockNum);
 	}
 	else{
-		while(p->blockNum!=blockNum && p!=NULL){
+		while(p->blockNum!=blockNum && p->link!=NULL){
 			r = p;
 			p = p->link;
-		}
-		if(p==NULL){//找到最后了也没有找到
+		} 
+		if(p->link==NULL){//找到最后了也没有找到
 			LRU_add(blockNum);
 		}
 		else{//找到了；
