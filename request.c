@@ -91,7 +91,7 @@ void do_handrequest(){
 	scanf("%u",&ptr_memAccReq->virAddr);
 
 	/*产生进程编号*/
-	printf("请输入进程编号：\n");
+	printf("请输入进程编号：0 or 1\n");
 	scanf("%u", &ptr_memAccReq->processNum);
 	
 	printf("请输入请求类型：请求类型中：0-read，1-write，2-execute\n");
@@ -164,6 +164,12 @@ void do_request()
 	/* 随机产生请求地址 */
 
 	ptr_memAccReq->virAddr = random() % VIRTUAL_MEMORY_SIZE;
+	
+	//create request processNum
+	if (random() % 2 == 0) {
+		ptr_memAccReq->processNum = 0;
+	}
+	else ptr_memAccReq->processNum = 1;
 
 	/* 随机产生请求类型 */
 
@@ -177,7 +183,7 @@ void do_request()
 
 			ptr_memAccReq->reqType = REQUEST_READ;
 
-			printf("产生请求：\n地址：%u\t类型：读取\n", ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：读取\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 
 			break;
 
@@ -193,7 +199,7 @@ void do_request()
 
 			ptr_memAccReq->value = random() % 0xFFu;
 
-			printf("产生请求：\n地址：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr, ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum, ptr_memAccReq->value);
 
 			break;
 
@@ -205,7 +211,7 @@ void do_request()
 
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
 
-			printf("产生请求：\n地址：%u\t类型：执行\n",ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：执行\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 
 			break;
 
