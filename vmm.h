@@ -1,3 +1,6 @@
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
 #ifndef VMM_H
 #define VMM_H
 
