@@ -37,7 +37,8 @@ Ptr_MemoryAccessRequest ptr_memAccReq;
 //LRU的链表
 
  PageNode head = NULL;
-
+///////////////////////
+int fifo;
 
 
 
@@ -1329,6 +1330,7 @@ int main(int argc, char* argv[])
 	int countnum;
 	struct stat statbuf;
 	int i;
+	CMD cmd;
 	printf("start file");
 
 	initFile();
@@ -1336,9 +1338,7 @@ int main(int argc, char* argv[])
 	if (!(ptr_auxMem = fopen(AUXILIARY_MEMORY, "r+")))
 
 	{
-
 		do_error(ERROR_FILE_OPEN_FAILED);
-
 		exit(1);
 
 	}
@@ -1378,6 +1378,17 @@ int main(int argc, char* argv[])
 	while (TRUE)
 
 	{
+		//读取文件
+		bzero(&cmd,DATALEN);
+		if((countnum = read(fifo,&cmd,DATALEN))<0)
+		{
+			do_error(ERROR_FIFO_READ_FAILED);
+			printf("errno=%d\n",errno);
+			exit(1);
+		}
+		if(countnum == 0){
+			continue;
+		}
 		printf("按D手动输入命令，按其他键自动生成命令...\n");
 
 		if ((c = getchar()) == 'D' || c == 'd')
@@ -1448,7 +1459,7 @@ int main(int argc, char* argv[])
 		exit(1);
 
 	}
-
+	fclose(fifo);
 	return (0);
 
 }
