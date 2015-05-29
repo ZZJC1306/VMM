@@ -967,6 +967,34 @@ void do_error(ERROR_CODE code)
 
 		}
 
+		case ERROR_PROCESS_NOT_FOUND:
+		{
+			printf("进程错误：进程不存在\n");
+			break;
+		}
+		
+		case ERROR_FIFO_CREATE_FAILED:
+		{
+			printf("fifo错误：fifo文件创建失败\n");
+			break;
+		}
+		
+		case ERROR_FIFO_OPEN_FAILED:
+		{
+			printf("fifo错误：fifo文件打开失败\n");
+			break;
+		}
+		
+		case ERROE_FIFO_READ_FAILED:
+		{
+			printf("fifo错误：fifo文件读取失败\n");
+			break;
+		}
+		case ERROR_FIFO_REMOVE_FAILED:
+		{
+			printf("fifo错误：fifo文件删除失败\n");
+			break;
+		}
 		default:
 
 		{
@@ -989,10 +1017,14 @@ void do_handrequest(){
 	printf("请输入请求地址:\n");
 	scanf("%u",&ptr_memAccReq->virAddr);
 
+	/*产生进程编号*/
+	printf("请输入进程编号：\n");
+	scanf("%u", &ptr_memAccReq->processNum);
+	
 	printf("请输入请求类型：请求类型中：0-read，1-write，2-execute\n");
 
 	scanf("%d",&a);
-	/* 随机产生请求类型 */
+	/* 输入产生请求类型 */
 
 	switch (a%3)
 
@@ -1004,7 +1036,7 @@ void do_handrequest(){
 
 			ptr_memAccReq->reqType = REQUEST_READ;
 
-			printf("产生请求：\n地址：%u\t类型：读取\n", ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：读取\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum);
 
 			break;
 
@@ -1022,7 +1054,7 @@ void do_handrequest(){
 
 			scanf("%02x",&ptr_memAccReq->value);
 
-			printf("产生请求：\n地址：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr, ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：写入\t值%02X\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum, ptr_memAccReq->value);
 
 			break;
 
@@ -1034,7 +1066,7 @@ void do_handrequest(){
 
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
 
-			printf("产生请求：\n地址：%u\t类型：执行\n", ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：执行\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum);
 
 			break;
 
@@ -1294,7 +1326,8 @@ int main(int argc, char* argv[])
 {
 
 	char c;
-
+	int countnum;
+	struct stat statbuf;
 	int i;
 	printf("start file");
 
@@ -1318,7 +1351,28 @@ int main(int argc, char* argv[])
 	do_print_info();
 
 	ptr_memAccReq = (Ptr_MemoryAccessRequest) malloc(sizeof(MemoryAccessRequest));
-
+	//获取文件信息，并将其保存在statbuf中
+	if(stat("/tmp/server",&statbuf) == 0)
+	{
+		//如果文件删除失败
+		if(remove("/tmp/server")<0)
+		{
+			do_error(ERROR_FIFO_REMOVE_FAILED);
+			exit(1);
+		}
+	}
+	//创建文件名称为"/tmp/server"的文件，0666为文件权限可读可写
+	if(mkfifo("/tmp/server",0666)<0)
+	{
+		do_error(ERROR_FIFO_CREATE_FAILED);
+		exit(1);
+	}
+	/*打开文件*/
+	if((fifo = open("/tmp/server",0_RDONLY))<0)
+	{
+		do_error(ERROR_FIFO_OPEN_FAILED);
+		exit(1);
+	}
 	/* 在循环中模拟访存请求与处理过程 */
 
 	while (TRUE)
