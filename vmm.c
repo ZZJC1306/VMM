@@ -559,19 +559,33 @@ void do_request()
 /* 打印页表 */
 //修改了二级页表
 void do_print_info()
+
 {
+
 	unsigned int i, j, k;
+
 	char str[4];
+
 	printf("页目录\t页号\t块号\t装入\t修改\t保护\t计数\t辅存\n");
+
 	for (i = 0; i < ROOT_PAGE_SUM; i++)
+
 	{
+
 		for(j = 0; j<CHILD_PAGE_SUM; j++)
+
 		{
-			printf("%u\t%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i,j,pageTable[i].blockNum, pageTable[i].filled, 
-				pageTable[i].edited, get_proType_str(str, pageTable[i].proType), 
-				pageTable[i].count, pageTable[i].auxAddr);
+
+			printf("%u\t%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i,j,pageTable[i][j].blockNum, pageTable[i][j].filled, 
+
+				pageTable[i][j].edited, get_proType_str(str, pageTable[i][j].proType), 
+
+				pageTable[i][j].count, pageTable[i].auxAddr);
+
 		}
+
 	}
+
 }
 
 /*打印辅存内容*/
