@@ -66,6 +66,11 @@ typedef enum {
 	REQUEST_EXECUTE 
 } MemoryAccessRequestType;
 
+typedef struct
+{
+	char c;
+	MemoryAccessRequest request;
+}CMD;
 /* 访存请求 */
 typedef struct
 {
