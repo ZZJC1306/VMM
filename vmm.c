@@ -1092,7 +1092,7 @@ void do_handrequest(){
 
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
 
-			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：执行\n", ptr_memAccReq->virAddr,prt_memAccReq->processNum);
+			printf("产生请求：\n地址：%u\t进程编号 ：%u\t类型：执行\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 
 			break;
 
