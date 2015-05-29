@@ -49,7 +49,11 @@ int main()
 			exit(1);
 		}
 	close(fd);	
+	if(c =='x'||c=='X')
+		break;
+	while((c = getchar()) != '\n');
 	}
+	return 0;
 }
 void do_handrequest(){
 
@@ -108,12 +112,8 @@ void do_request()
 	/* 随机产生请求地址 */
 
 	ptr_memAccReq->virAddr = random() % VIRTUAL_MEMORY_SIZE;
-	
+	ptr_memAccReq->processNum = random() % PROCESSNUM;
 	//create request processNum
-	if (random() % 2 == 0) {
-		ptr_memAccReq->processNum = 0;
-	}
-	else ptr_memAccReq->processNum = 1;
 
 	/* 随机产生请求类型 */
 
