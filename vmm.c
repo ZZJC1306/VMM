@@ -72,6 +72,12 @@ void do_init()
 			pageTable[i][k].edited = FALSE;//页面修改标示
 
 			pageTable[i][k].count = 0;//页面的使用次数
+			
+			// initial processNum
+			if (random() % 2 == 0) {
+				pageTable[i][k].processNum = 0;
+			}
+			else pageTable[i][k].processNum = 1;
 
 			/* 随机将页面保护类型设置为以下其中情况中的一种 */
 
@@ -271,9 +277,9 @@ void do_response()
 
 	}
 	
-	/*jjjj检查进程编号是否符合要求*/
+	/*检查进程编号是否符合要求*/
 	if(ptr_memAccReq->processNum < 0||ptr_memAccReq->processNum >= PROCESSNUM){
-		do_erro(ERROR_PROCESS_NOT_FOUND);
+		do_error(ERROR_PROCESS_NOT_FOUND);
 		return;
 	}
 
@@ -319,7 +325,10 @@ void do_response()
 
 	printf("实地址为%u\n", actAddr);
 
-	
+	if (ptr_pageTabIt->processNum != ptr_memAccReq->processNum) {
+		do_error(ERROR_PROCESS_DISMATCH);
+		return;
+	}
 
 	/* 检查页面访问权限并处理访存请求 */
 
@@ -975,6 +984,16 @@ void do_error(ERROR_CODE code)
 			break;
 		}
 		
+		case ERROR_PROCESS_DISMATCH:
+
+		{
+
+			printf("访存失败：进程不匹配\n");
+
+			break;
+
+		}
+		
 		case ERROR_FIFO_CREATE_FAILED:
 		{
 			printf("fifo错误：fifo文件创建失败\n");
@@ -1002,6 +1021,7 @@ void do_error(ERROR_CODE code)
 		{
 
 			printf("未知错误：没有这个错误代码\n");
+			break；
 
 		}
 
@@ -1020,7 +1040,7 @@ void do_handrequest(){
 	scanf("%u",&ptr_memAccReq->virAddr);
 
 	/*产生进程编号*/
-	printf("请输入进程编号：\n");
+	printf("请输入进程编号：0 or 1\n");
 	scanf("%u", &ptr_memAccReq->processNum);
 	
 	printf("请输入请求类型：请求类型中：0-read，1-write，2-execute\n");
@@ -1093,6 +1113,12 @@ void do_request()
 	/* 随机产生请求地址 */
 
 	ptr_memAccReq->virAddr = random() % VIRTUAL_MEMORY_SIZE;
+	
+	//create request processNum
+	if (random() % 2 == 0) {
+		ptr_memAccReq->processNum = 0;
+	}
+	else ptr_memAccReq->processNum = 1;
 
 	/* 随机产生请求类型 */
 
@@ -1106,7 +1132,7 @@ void do_request()
 
 			ptr_memAccReq->reqType = REQUEST_READ;
 
-			printf("产生请求：\n地址：%u\t类型：读取\n", ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：读取\n", ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 
 			break;
 
@@ -1122,7 +1148,7 @@ void do_request()
 
 			ptr_memAccReq->value = random() % 0xFFu;
 
-			printf("产生请求：\n地址：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr, ptr_memAccReq->value);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：写入\t值：%02X\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum, ptr_memAccReq->value);
 
 			break;
 
@@ -1134,7 +1160,7 @@ void do_request()
 
 			ptr_memAccReq->reqType = REQUEST_EXECUTE;
 
-			printf("产生请求：\n地址：%u\t类型：执行\n",ptr_memAccReq->virAddr);
+			printf("产生请求：\n地址：%u\t进程号：%u\t类型：执行\n",ptr_memAccReq->virAddr,ptr_memAccReq->processNum);
 
 			break;
 
@@ -1163,7 +1189,7 @@ void do_print_info()
 
 	char str[4];
 
-	printf("页目录\t页号\t块号\t装入\t修改\t保护\t计数\t辅存\n");
+	printf("页目录\t页号\t块号\t装入\t进程号\t修改\t保护\t计数\t辅存\n");
 
 	for (i = 0; i < ROOT_PAGE_SUM; i++)
 
@@ -1173,7 +1199,7 @@ void do_print_info()
 
 		{
 
-			printf("%u\t%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i,j,pageTable[i][j].blockNum, pageTable[i][j].filled, 
+			printf("%u\t%u\t%u\t%u\t%u\t%u\t%s\t%u\t%u\n", i,j,pageTable[i][j].blockNum, pageTable[i][j].filled, pageTable[i][j].processNum, 
 
 				pageTable[i][j].edited, get_proType_str(str, pageTable[i][j].proType), 
 
@@ -1425,7 +1451,7 @@ int main(int argc, char* argv[])
 
 			c = getchar();
 
-		printf("按B打印实存，按其他键不打印...\n");
+		printf("按B打印虚存，按其他键不打印...\n");
 
 		if ((c = getchar()) == 'b' || c == 'B')
 
