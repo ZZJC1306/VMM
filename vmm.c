@@ -30,7 +30,8 @@ void do_init()
 	for (i = 0; i < ROOT_PAGE_SUM; i++)
 	{
 		for(k = 0; k<CHILD_PAGE_SUM; k++){
-			pageTable[i][k].pageNum = i;
+			pageTable[i][k].rootpageNum = i;
+			pageTable[i][k].childpageNum = k;
 			pageTable[i][k].filled = FALSE;//页面装入的特征位
 			pageTable[i][k].edited = FALSE;//页面修改标示
 			pageTable[i][k].count = 0;//页面的使用次数
