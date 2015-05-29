@@ -100,14 +100,15 @@ void do_init()
 }
 
 
-/* 响应请求 */
+/* 响应请求*/
+//已更新二级页表
 void do_response()
 {
 	Ptr_PageTableItem ptr_pageTabIt;
-	unsigned int pageNum, offAddr;
+	unsigned int RootPageSum, ChildPageSum,offAddr,SinglePageSum;
 	unsigned int actAddr;
 	
-	/* 检查地址是否越界 */
+	/* 检查地址是否越界*/
 	if (ptr_memAccReq->virAddr < 0 || ptr_memAccReq->virAddr >= VIRTUAL_MEMORY_SIZE)
 	{
 		do_error(ERROR_OVER_BOUNDARY);
@@ -115,42 +116,46 @@ void do_response()
 	}
 	
 	/* 计算页号和页内偏移值 */
-	pageNum = ptr_memAccReq->virAddr / PAGE_SIZE;
+	SinglePageSum = PAGE_SIZE*CHILD_PAGE_SUM;
+	RootPageSum = ptr_memAccReq->virAddr / SinglePageSum;
+	ChildPageSum = (ptr_memAccReq->virAddr % SinglePageSum) / PAGE_SIZE;
 	offAddr = ptr_memAccReq->virAddr % PAGE_SIZE;
-	printf("页号为：%u\t页内偏移为：%u\n", pageNum, offAddr);
+	printf("页目录号为：%u\t,二级目录页号为：%u\t,页内偏移为：%u\n", RootPageSum,ChildPageSum, offAddr);
 
 	/* 获取对应页表项 */
-	ptr_pageTabIt = &pageTable[pageNum];
+	ptr_pageTabIt = &pageTable[RootPageSum][ChildPageSum];
 	
 	/* 根据特征位决定是否产生缺页中断 */
 	if (!ptr_pageTabIt->filled)
 	{
 		do_page_fault(ptr_pageTabIt);
 	}else{
+
 		LRU_ChangeAdd(ptr_pageTabIt->blockNum);
 	}
 	
 	actAddr = ptr_pageTabIt->blockNum * PAGE_SIZE + offAddr;
-	printf("实地址为：%u\n", actAddr);
+	printf("实地址为%u\n", actAddr);
 	
 	/* 检查页面访问权限并处理访存请求 */
 	switch (ptr_memAccReq->reqType)
 	{
 		case REQUEST_READ: //读请求
 		{
-			ptr_pageTabIt->count++;
+			//ptr_pageTabIt->count++;
+			//else 的地方已经加过了；这个count只是为了LFU代码，现在不需要了；
 			if (!(ptr_pageTabIt->proType & READABLE)) //页面不可读
 			{
 				do_error(ERROR_READ_DENY);
 				return;
 			}
 			/* 读取实存中的内容 */
-			printf("读操作成功：值为%02X\n", actMem[actAddr]);
+			printf("读操作成功%02X\n", actMem[actAddr]);
 			break;
 		}
 		case REQUEST_WRITE: //写请求
 		{
-			ptr_pageTabIt->count++;
+			//ptr_pageTabIt->count++;
 			if (!(ptr_pageTabIt->proType & WRITABLE)) //页面不可写
 			{
 				do_error(ERROR_WRITE_DENY);	
@@ -164,7 +169,7 @@ void do_response()
 		}
 		case REQUEST_EXECUTE: //执行请求
 		{
-			ptr_pageTabIt->count++;
+			//ptr_pageTabIt->count++;
 			if (!(ptr_pageTabIt->proType & EXECUTABLE)) //页面不可执行
 			{
 				do_error(ERROR_EXECUTE_DENY);
