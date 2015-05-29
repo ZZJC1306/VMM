@@ -6,6 +6,7 @@
 
 #include "vmm.h"
 
+#include<errno.h>
 
 
 /* 页表 */
