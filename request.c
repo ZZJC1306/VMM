@@ -8,6 +8,16 @@
 #include<fcntl.h>
 #include "vmm.h"
 
+CMD cmd;
+Prt_MemoryAccessRequest ptr_memAccReq = &(cmd.request);
+
+int main()
+{
+	char c;
+	int fd;
+	srandom(time(NULL));
+	
+}
 void do_handrequest(){
 
 	/* 产生请求地址 */
