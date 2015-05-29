@@ -59,7 +59,7 @@ typedef struct
 	BOOL edited; //页面修改标识
 	unsigned long auxAddr; //外存地址
 	unsigned long count; //页面使用计数器
-	unsigned long processNum;//进程编号
+	unsigned int processNum;//进程编号
 } PageTableItem, *Ptr_PageTableItem;
 
 /* 访存请求类型 */
@@ -73,7 +73,7 @@ typedef enum {
 /* 访存请求 */
 typedef struct
 {
-	unsigned long processNum;//进程编号
+	unsigned int processNum;//进程编号
 	MemoryAccessRequestType reqType; //访存请求类型
 	unsigned long virAddr; //虚地址
 	BYTE value; //写请求的值
