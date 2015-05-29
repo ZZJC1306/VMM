@@ -1006,7 +1006,7 @@ void do_error(ERROR_CODE code)
 			break;
 		}
 		
-		case ERROE_FIFO_READ_FAILED:
+		case ERROR_FIFO_READ_FAILED:
 		{
 			printf("fifo错误：fifo文件读取失败\n");
 			break;
