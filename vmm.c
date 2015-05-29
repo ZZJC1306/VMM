@@ -988,7 +988,6 @@ void do_error(ERROR_CODE code)
 			printf("进程错误：进程不存在\n");
 			break;
 		}
-		
 		case ERROR_PROCESS_DISMATCH:
 
 		{
