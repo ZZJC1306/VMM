@@ -67,7 +67,7 @@ typedef enum {
 	REQUEST_READ, 
 	REQUEST_WRITE, 
 	REQUEST_EXECUTE 
-} MemoryAccessRequestType;
+} MemoryAccessRequestType,*MemoryAccessRequestType;
 
 #define DATALEN sizeof(CMD)
 /* 访存请求 */
