@@ -17,7 +17,7 @@ BOOL blockStatus[BLOCK_SUM];
 /* 访存请求 */
 Ptr_MemoryAccessRequest ptr_memAccReq;
 //LRU的链表
- PageNode *head = NULL;
+ PageNode head = NULL;
 
 
 /* 初始化*/
