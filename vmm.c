@@ -646,6 +646,7 @@ int main(int argc, char* argv[])
 {
 	char c;
 	int i;
+	initFile();
 	if (!(ptr_auxMem = fopen(AUXILIARY_MEMORY, "r+")))
 	{
 		do_error(ERROR_FILE_OPEN_FAILED);
