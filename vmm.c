@@ -580,7 +580,7 @@ void do_print_info()
 
 				pageTable[i][j].edited, get_proType_str(str, pageTable[i][j].proType), 
 
-				pageTable[i][j].count, pageTable[i].auxAddr);
+				pageTable[i][j].count, pageTable[i][j].auxAddr);
 
 		}
 
