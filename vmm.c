@@ -330,6 +330,11 @@ void do_response()
 		return;
 	}
 
+	/*检查进程编号是否匹配*/
+	if(ptr_memAccReq->processNum != ptr_pageTabIt->processNum){
+		do_error(ERROR_PROCESS_DISMATCH);
+		return;
+	}
 	/* 检查页面访问权限并处理访存请求 */
 
 	switch (ptr_memAccReq->reqType)
