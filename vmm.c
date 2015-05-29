@@ -585,8 +585,7 @@ void do_print_virtual(){
 		do_error(ERROR_FILE_SEEK_FAILED);
 		exit(1);
 	}
-	if ((readNum = fread(temp, 
-		sizeof(BYTE), VIRTUAL_MEMORY_SIZE, ptr_auxMem)) < VIRTUAL_MEMORY_SIZE)
+	if ((readNum = fread(temp, sizeof(BYTE), VIRTUAL_MEMORY_SIZE, ptr_auxMem)) < VIRTUAL_MEMORY_SIZE)
 	{
 		do_error(ERROR_FILE_READ_FAILED);
 		exit(1);
@@ -611,13 +610,15 @@ void do_print_actual(){
 	int i,j,k;
 	printf("打印实存内容:\n");
 	
-	printf("页号\t内容\t\n");
+	printf("块号\t内容\t\n");
 	for(i=0,k=0;i<BLOCK_SUM;i++){
 		printf("%d\t",i);
 		if(blockStatus[i]==TRUE){
 			for(j=0;j<PAGE_SIZE;j++)		
 				printf("%02x ",actMem[k++]);
 		}
+		else
+		        k+=4;
 		printf("\n");
 	}
 
