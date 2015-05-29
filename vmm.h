@@ -89,7 +89,6 @@ typedef enum {
 	ERROR_FILE_READ_FAILED, //文件读取失败
 	ERROR_FILE_WRITE_FAILED, //文件写入失败
 	ERROR_PROCESS_NOT_FOUND, //进程不存在
-	ERROR_PROCESS_DISMATCH,//进程不匹配
 	ERROR_FIFO_CREATE_FAILED,//fifo文件创建失败
 	ERROR_FIFO_OPEN_FAILED,//fifo文件打开失败
 	ERROR_FIFO_READ_FAILED,//fifo文件读取失败
