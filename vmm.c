@@ -324,7 +324,7 @@ void LRU_add(int blockNum){
 //和LFU差不多，就是判断条件变了；怎么知道什么是最早最久使用的呢，建立一个链表，一旦使用了哪个
 void do_LRU(Ptr_PageTableItem ptr_pageTabIt){
 
-	unsigned int i,j, pagei = 0,pagej = 0，blockNum;
+	unsigned int i,j, pagei = 0,pagej = 0,blockNum;
 	int flag = 0;
 	printf("没有空闲物理块，开始进行LFU页面替换...\n");
 	while(flag==0){
@@ -491,7 +491,7 @@ void do_handrequest(){
 	int a;
 	unsigned long virAddr;
 
-	print("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-")
+	print("请输入请求地址和请求类型：请求类型中：0-read，1-write，2-execute");
 	scanf("%d %d",&virAddr,&a);
 	ptr_memAccReq->virAddr = virAddr;
 	/* 随机产生请求类型 */
